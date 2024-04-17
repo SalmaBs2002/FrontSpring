@@ -1,13 +1,29 @@
 "use client";
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState ,useEffect} from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import UserList from './UserList';
 
 const AddUser = () => {
   const USER_API_BASE_URL = "http://localhost:8080/api/v1/users";
+  const DEPARTMENTS_API_BASE_URL = "http://localhost:8080/api/v1/departments";
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState({ id: "", firstName: "", lastName: "", emailId: "" });
-  const [responseUser, setresponseUser] = useState({ id: "", firstName: "", lastName: "", emailId: "" });
+  const [user, setUser] = useState({ id: "", firstName: "", lastName: "", emailId: "",departement: "" });
+  const [responseUser, setresponseUser] = useState({ id: "", firstName: "", lastName: "", emailId: "",departement: ""  });
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await fetch(DEPARTMENTS_API_BASE_URL);
+        const fetchedDepartments = await response.json();
+        setDepartments(fetchedDepartments);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
 
   function closeModal() {
     setIsOpen(false);
@@ -25,8 +41,8 @@ const AddUser = () => {
   const saveUser = async () => {
     try {
       // Validation of email
-      if (!user.emailId.endsWith("@enicar.ucar.tn")) {
-        throw new Error("Invalid email address. Please enter a valid email ending with @enicar.ucar.tn");
+      if (!user.emailId.endsWith("@enicar-ucar.tn")) {
+        throw new Error("Invalid email address. Please enter a valid email ending with @enicar-ucar.tn");
       }
   
       const response = await fetch(USER_API_BASE_URL, {
@@ -47,8 +63,6 @@ const AddUser = () => {
       reset();
     } catch (error) {
       console.error("Error saving user:", error.message);
-      // Handle error here, you can show an error message to the user if needed
-      // For example:
       alert("Error saving user: " + error.message);
     }
   }
@@ -58,7 +72,7 @@ const AddUser = () => {
       e.preventDefault(); // Only call preventDefault if the event object is provided
     }
     setUser({
-      id: "", firstName: "", lastName: "", emailId: "",
+      id: "", firstName: "", lastName: "", emailId: "",departement: "" ,
     });
     setIsOpen(false);
   };
@@ -97,6 +111,15 @@ const AddUser = () => {
                       <label className='block text-gray-600 text-sm font-normal'>Email id</label>
                       <input type='text' name='emailId' className='h-10 w-96 border mt-2 px-2 py-2' value={user.emailId} onChange={handleChange}></input>
                     </div>
+                    <div className='h-14 my-4'>
+                      <label className='block text-gray-600 text-sm font-normal'>Departement</label>
+                      <select name='departement' className='h-10 w-96 border mt-2 px-2 py-2' value={user.departement} onChange={handleChange}>
+                        {departments.map((dept) => (
+                          <option key={dept} value={dept}>{dept}</option>
+                        ))}
+                      </select>
+                    </div>
+
                     <div className='h-14 my-4 space-x-4 pt-4'>
                       <button onClick={saveUser} className='rounded text-white font-semibold bg-green-400 hover:bg-green-700 py-2 px-6'>Save</button>
                       <button onClick={reset} className='rounded text-white font-semibold bg-red-400 hover:bg-red-700 py-2 px-6'>Close</button>

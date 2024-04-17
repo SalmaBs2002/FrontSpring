@@ -1,10 +1,10 @@
 import React, { Fragment, useState , useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
-const EditUser = ({userId ,setresponseUser}) => {
+const EditUser = ({userId ,setresponseUser,departments}) => {
   const USER_API_BASE_URL = "http://localhost:8080/api/v1/users";
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState({ id: "", firstName: "", lastName: "", emailId: "" });
+  const [user, setUser] = useState({ id: "", firstName: "", lastName: "", emailId: "", departement:"" });
   
   useEffect(() => {
    const fetchData = async () => {
@@ -90,6 +90,14 @@ const EditUser = ({userId ,setresponseUser}) => {
                       <label className='block text-gray-600 text-sm font-normal'>Email id</label>
                       <input type='text' name='emailId' className='h-10 w-96 border mt-2 px-2 py-2' value={user.emailId} onChange={handleChange}></input>
                     </div>
+                    <div className='h-14 my-4'>
+                    <label className='block text-gray-600 text-sm font-normal'>Departement</label>
+                    <select name='departement' className='h-10 w-96 border mt-2 px-2 py-2' value={user.departement} onChange={handleChange}>
+                      {departments.map((dept) => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                    </select>
+                  </div>
                     <div className='h-14 my-4 space-x-4 pt-4'>
                       <button onClick={updateUser} className='rounded text-white font-semibold bg-green-400 hover:bg-green-700 py-2 px-6'>Update</button>
                       <button onClick={reset} className='rounded text-white font-semibold bg-red-400 hover:bg-red-700 py-2 px-6'>Close</button>

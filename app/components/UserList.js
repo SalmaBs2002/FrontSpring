@@ -6,10 +6,13 @@ import EditUser from "./EditUser";
 
 const UserList = ({user})=> {
   const USER_API_BASE_URL = "http://localhost:8080/api/v1/users";
+  const DEPARTMENTS_API_BASE_URL = "http://localhost:8080/api/v1/departments";
   const [users, setUsers] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userId, setuserId] = useState(null);
   const [responseUser, setresponseUser]= useState(null);
+  const [departments, setDepartments] = useState([]);
+  
   
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +33,20 @@ const UserList = ({user})=> {
     fetchData();
   }, [user,responseUser]);
 
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await fetch(DEPARTMENTS_API_BASE_URL);
+        const fetchedDepartments = await response.json();
+        setDepartments(fetchedDepartments);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+     
   const deleteUser = (e,id) => {
     e.preventDefault();
     fetch(USER_API_BASE_URL + "/" + id , {
@@ -58,6 +75,7 @@ const UserList = ({user})=> {
               <th className="text-left font-medium text-gray-500 uppercase tracking-wide py-3 px-6">First Name</th>
               <th className="text-left font-medium text-gray-500 uppercase tracking-wide py-3 px-6">Last Name</th>
               <th className="text-left font-medium text-gray-500 uppercase tracking-wide py-3 px-6">Email Id</th>
+              <th className="text-left font-medium text-gray-500 uppercase tracking-wide py-3 px-6">Departement</th>
               <th className="text-left font-medium text-gray-500 uppercase tracking-wide py-3 px-6">Actions</th>
             </tr>
           </thead>
@@ -65,13 +83,14 @@ const UserList = ({user})=> {
             <tbody className="bg-white">
               {users.map((user) => (
                 <User key={user.id} user={user} deleteUser={deleteUser} editUser={editUser}/>
+                
               ))}
             </tbody>
           )}
         </table>
       </div>
     </div>
-    <EditUser userId ={userId} setresponseUser={setresponseUser}/>
+    <EditUser userId ={userId} setresponseUser={setresponseUser} departments={departments}/>
     </>
   );
 };
